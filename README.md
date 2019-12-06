@@ -17,6 +17,8 @@ Docker file is available to upload a service container, with all dependencies on
 >When loading the container, simply access localhost:8080
 
  enter the folder **"docker/www-root/pastelandia"** for execute the project
+
+ `Maybe to run the project it is necessary to adjust the write permissions of the files in the folder.`
  
 #### Some commands are required.
 
