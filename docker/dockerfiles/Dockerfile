@@ -2,8 +2,8 @@ FROM alpine:latest
 LABEL Maintainer="Marcelo Nenzinho <mcneill.marcelo@outlook.com>" \
       Description="Lightweight container with Nginx 1.16 & PHP-FPM 7.3 based on Alpine Linux."
 
-ENV HOME_PRJ pastelaria
-ENV WWW_HOME /var/www/html
+ENV HOME_PRJ html
+ENV WWW_HOME /var/www
 
 #https://hub.docker.com/r/trafex/alpine-nginx-php7/ 
 
@@ -55,9 +55,13 @@ RUN apk --no-cache --update add php7 \
                     php-phar \
                     php-phpdbg \
                     php-iconv \
-                    php-calendar php-bcmath php-mongodb php-redis php-xdebug php-tokenizer php-ctype
-
-
+                    php-calendar \
+                    php-bcmath \
+                    php-mongodb \
+                    php-redis \
+                    php-xdebug \
+                    php-tokenizer \
+                    php-ctype
 #
 # Configure nginx
 COPY ./config/nginx.conf /etc/nginx/nginx.conf
@@ -79,12 +83,16 @@ RUN mkdir -p $WWW_HOME/$HOME_PRJ/bootstrap
 RUN mkdir -p $WWW_HOME/$HOME_PRJ/storage
 RUN mkdir -p $WWW_HOME/$HOME_PRJ/storage/tmp_files
 
-# Make sure files/folders needed by the processes are accessable when they run under the nobody user
-RUN chown -R nobody.nobody /run && \
-  chown -R nobody.nobody /var/lib/nginx && \
-  chown -R nobody.nobody /var/tmp/nginx && \
-  chown -R nobody.nobody /var/log/nginx && \
-  chown -R nobody.nobody $WWW_HOME
+# Make sure files/folders needed by the processes are accessable when they run under the nginx user
+#
+RUN mkdir -p /var/tmp/nginx
+RUN mkdir -p /var/log/nginx
+#
+RUN chown -R nginx.nginx /run && \
+  chown -R nginx.nginx /var/lib/nginx && \
+  chown -R nginx.nginx /var/tmp/nginx && \
+  chown -R nginx.nginx /var/log/nginx && \
+  chown -R nginx.nginx $WWW_HOME
 #
 RUN find $WWW_HOME -type f -exec chmod 640 {} \;
 RUN find $WWW_HOME -type d -exec chmod 750 {} \;
@@ -100,7 +108,10 @@ RUN find $WWW_HOME/$HOME_PRJ/storage/tmp_files -type d -exec chmod 760 {} \;
 
 
 # Switch to use a non-root user from here on
-USER nobody
+#ARG UID=1000
+#ENV USER="ubuntu"
+#RUN useradd -u $UID -ms /bin/bash $USER
+USER nginx
 
 # Add application
 WORKDIR $WWW_HOME
