@@ -5,4 +5,22 @@ services:
     ports:
         - 8080:8080
     volumes:
-        - ./www-root/pastelandia:/var/www/html,rw
+        - vl_www:/var/www/html
+        - vl_logs:/var/lib/nginx/logs
+    extra_hosts:
+      - "local.srv-mysql:127.0.0.1"
+      - "local.srv-redis:127.0.0.1"
+      - "local.srv-mongo:127.0.0.1"
+volumes:
+  vl_www:
+    driver: local
+    driver_opts:
+      type: nfs
+      device: /home/mnenzinho/sources/projects/laravel-api/docker/www-root/pastelandia
+      o: bind
+  vl_logs:
+    driver: local
+    driver_opts:
+      type: nfs
+      device: /home/mnenzinho/sources/projects/laravel-api/docker/logs
+      o: bind

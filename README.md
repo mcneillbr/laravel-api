@@ -25,9 +25,9 @@ Docker file is available to upload a service container, with all dependencies on
 >**The project needs a MySql database that is already set up and running.
 Configure the .env**
 
-#php  artisan  migrate
+$ php  artisan  migrate
 or
-#hp  artisan  migrate  --seed
+$ php  artisan  migrate  --seed
 
 In the root folder is the file PastelCollection.postman_collection.json, to be Used in Postman
 

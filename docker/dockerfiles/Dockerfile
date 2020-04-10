@@ -5,7 +5,9 @@ LABEL Maintainer="Marcelo Nenzinho <mcneill.marcelo@outlook.com>" \
 ENV HOME_PRJ html
 ENV WWW_HOME /var/www
 
-#https://hub.docker.com/r/trafex/alpine-nginx-php7/ 
+#https://hub.docker.com/r/trafex/alpine-nginx-php7/
+
+RUN apk --update add bash wget
 
 # create nginx user/group first, to be consistent throughout docker variants
 RUN set -x \
@@ -29,6 +31,7 @@ RUN echo "https://dl.bintray.com/php-alpine/v3.9/php-7.3" >> /etc/apk/repositori
 # install php and some extensions
 RUN apk --no-cache --update add php7 \
                     php-common \
+                    php-cli \
                     php7-fpm \
                     php-mysqlnd \
                     php7-json \
@@ -48,6 +51,7 @@ RUN apk --no-cache --update add php7 \
                     php7-gd \
                     php-pcntl \
                     php-sqlite3 \
+                    php-pdo \
                     php-pdo_mysql \
                     php-pdo_sqlite \
                     php-pdo_pgsql \
@@ -87,11 +91,13 @@ RUN mkdir -p $WWW_HOME/$HOME_PRJ/storage/tmp_files
 #
 RUN mkdir -p /var/tmp/nginx
 RUN mkdir -p /var/log/nginx
+RUN mkdir -p /var/cache/nginx
 #
 RUN chown -R nginx.nginx /run && \
   chown -R nginx.nginx /var/lib/nginx && \
   chown -R nginx.nginx /var/tmp/nginx && \
   chown -R nginx.nginx /var/log/nginx && \
+  chown -R nginx.nginx /var/cache/nginx && \
   chown -R nginx.nginx $WWW_HOME
 #
 RUN find $WWW_HOME -type f -exec chmod 640 {} \;
@@ -109,8 +115,9 @@ RUN find $WWW_HOME/$HOME_PRJ/storage/tmp_files -type d -exec chmod 760 {} \;
 
 # Switch to use a non-root user from here on
 #ARG UID=1000
-#ENV USER="ubuntu"
-#RUN useradd -u $UID -ms /bin/bash $USER
+#ENV USER="mnenzinho"
+#RUN addgroup -g $UID -S $USER  && adduser -D -H -u $UID -s /sbin/nologin -G $USER -g $USER $USER 
+#USER $USER
 USER nginx
 
 # Add application
